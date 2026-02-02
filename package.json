@@ -1,0 +1,19 @@
+{
+  "name": "maum-jangbu",
+  "version": "0.0.1",
+  "private": true,
+  "description": "마음장부 - 경조사 내역 관리 및 AI 적정 금액 제안 서비스",
+  "scripts": {
+    "dev:client": "pnpm --filter @maum-jangbu/client dev",
+    "dev:server": "pnpm --filter @maum-jangbu/server start:dev",
+    "build:client": "pnpm --filter @maum-jangbu/client build",
+    "build:server": "pnpm --filter @maum-jangbu/server build",
+    "dev": "pnpm run dev:client & pnpm run dev:server",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@9.15.4"
+}

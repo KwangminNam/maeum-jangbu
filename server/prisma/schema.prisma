@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  events    Event[]
+  friends   Friend[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Event {
+  id      String   @id @default(uuid())
+  title   String
+  type    String   // WEDDING, FUNERAL, BIRTHDAY, ETC
+  date    DateTime
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  records Record[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Friend {
+  id       String   @id @default(uuid())
+  name     String
+  relation String   // 직장 동료, 고교 동창 등 자유 입력
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  records  Record[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Record {
+  id       String  @id @default(uuid())
+  amount   Int     // 금액 (원 단위)
+  memo     String?
+  friendId String
+  friend   Friend  @relation(fields: [friendId], references: [id], onDelete: Cascade)
+  eventId  String
+  event    Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([friendId])
+  @@index([eventId])
+}
