@@ -1,13 +1,11 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { Suspense } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { use } from "react";
-import { api, type FriendDetail } from "@/lib/api";
+import { createFetchClient } from "@/lib/fetch-client";
+import { auth } from "@/lib/auth";
+import { BackButton } from "@/components/back-button";
+import type { FriendDetail } from "@/lib/api";
 
 const TYPE_LABEL: Record<string, string> = {
   WEDDING: "결혼",
@@ -16,31 +14,48 @@ const TYPE_LABEL: Record<string, string> = {
   ETC: "기타",
 };
 
-export default function FriendDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
-  const router = useRouter();
-  const [friend, setFriend] = useState<FriendDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+async function getFriend(id: string): Promise<FriendDetail | null> {
+  const session = await auth();
+  if (!session?.accessToken) return null;
 
-  useEffect(() => {
-    api.friends
-      .get(id)
-      .then(setFriend)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [id]);
+  const serverClient = createFetchClient(
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+  );
+  serverClient.setAuthToken(session.accessToken);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-dvh">
-        <p className="text-sm text-muted-foreground">불러오는 중...</p>
-      </div>
-    );
+  try {
+    return await serverClient.get<FriendDetail>(`/friends/${id}`);
+  } catch {
+    return null;
   }
+}
+
+function FriendDetailSkeleton() {
+  return (
+    <div className="flex flex-col px-5 pt-14 pb-4">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="h-5 w-5 bg-muted rounded animate-pulse" />
+        <div className="space-y-2">
+          <div className="h-6 w-24 bg-muted rounded animate-pulse" />
+          <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+        </div>
+      </div>
+      <Card className="p-4 mb-6 animate-pulse">
+        <div className="h-16 bg-muted rounded" />
+      </Card>
+      <div className="flex flex-col gap-3">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="p-4 animate-pulse">
+            <div className="h-12 bg-muted rounded" />
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+async function FriendDetailContent({ id }: { id: string }) {
+  const friend = await getFriend(id);
 
   if (!friend) {
     return (
@@ -56,9 +71,7 @@ export default function FriendDetailPage({
     <div className="flex flex-col px-5 pt-14 pb-4">
       {/* 헤더 */}
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => router.back()}>
-          <ArrowLeft size={20} />
-        </button>
+        <BackButton />
         <div>
           <h1 className="text-xl font-bold">{friend.name}</h1>
           <p className="text-sm text-muted-foreground">{friend.relation}</p>
@@ -109,5 +122,19 @@ export default function FriendDetailPage({
         ))}
       </div>
     </div>
+  );
+}
+
+export default async function FriendDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  return (
+    <Suspense fallback={<FriendDetailSkeleton />}>
+      <FriendDetailContent id={id} />
+    </Suspense>
   );
 }

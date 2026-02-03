@@ -9,12 +9,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EventService } from './event.service.js';
-import { DevAuthGuard } from '../auth/dev-auth.guard.js'; // TODO: JwtAuthGuard로 되돌릴 것
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { CreateEventDto } from './dto/create-event.dto.js';
 import { UpdateEventDto } from './dto/update-event.dto.js';
 
-@UseGuards(DevAuthGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('events')
 export class EventController {
   constructor(private eventService: EventService) {}

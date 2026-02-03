@@ -1,71 +1,28 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { client } from "./fetch-client";
 
-async function request<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<T> {
-  // TODO: 로그인 구현 후 Authorization 헤더 추가
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
-  if (!res.ok) {
-    throw new Error(`API Error: ${res.status}`);
-  }
-  return res.json();
-}
-
-// ── Events ──
+// ── API Methods ──
 export const api = {
   events: {
-    list: () => request<Event[]>("/events"),
-    get: (id: string) => request<EventDetail>(`/events/${id}`),
-    create: (data: CreateEvent) =>
-      request<Event>("/events", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    update: (id: string, data: Partial<CreateEvent>) =>
-      request(`/events/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      }),
-    delete: (id: string) =>
-      request(`/events/${id}`, { method: "DELETE" }),
+    list: () => client.get<Event[]>("/events"),
+    get: (id: string) => client.get<EventDetail>(`/events/${id}`),
+    create: (data: CreateEvent) => client.post<Event>("/events", data),
+    update: (id: string, data: Partial<CreateEvent>) => client.patch<Event>(`/events/${id}`, data),
+    delete: (id: string) => client.delete(`/events/${id}`),
   },
 
   friends: {
-    list: () => request<Friend[]>("/friends"),
-    get: (id: string) => request<FriendDetail>(`/friends/${id}`),
-    create: (data: CreateFriend) =>
-      request<Friend>("/friends", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    update: (id: string, data: Partial<CreateFriend>) =>
-      request(`/friends/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      }),
-    delete: (id: string) =>
-      request(`/friends/${id}`, { method: "DELETE" }),
+    list: () => client.get<Friend[]>("/friends"),
+    get: (id: string) => client.get<FriendDetail>(`/friends/${id}`),
+    create: (data: CreateFriend) => client.post<Friend>("/friends", data),
+    update: (id: string, data: Partial<CreateFriend>) => client.patch<Friend>(`/friends/${id}`, data),
+    delete: (id: string) => client.delete(`/friends/${id}`),
   },
 
   records: {
-    byEvent: (eventId: string) =>
-      request<Record[]>(`/records?eventId=${eventId}`),
-    byFriend: (friendId: string) =>
-      request<Record[]>(`/records?friendId=${friendId}`),
-    create: (data: CreateRecord) =>
-      request("/records", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    delete: (id: string) =>
-      request(`/records/${id}`, { method: "DELETE" }),
+    byEvent: (eventId: string) => client.get<GiftRecord[]>("/records", { eventId }),
+    byFriend: (friendId: string) => client.get<GiftRecord[]>("/records", { friendId }),
+    create: (data: CreateRecord) => client.post<GiftRecord>("/records", data),
+    delete: (id: string) => client.delete(`/records/${id}`),
   },
 };
 
@@ -110,7 +67,7 @@ export interface FriendDetail {
   }[];
 }
 
-export interface Record {
+export interface GiftRecord {
   id: string;
   amount: number;
   memo: string | null;
@@ -136,3 +93,5 @@ export interface CreateRecord {
   friendId?: string;
   friendIds?: string[];
 }
+
+export { client };

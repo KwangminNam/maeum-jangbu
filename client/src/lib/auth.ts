@@ -1,13 +1,15 @@
 import NextAuth from "next-auth";
-import Google from "next-auth/providers/google";
 import Kakao from "next-auth/providers/kakao";
+import { SignJWT } from "jose";
+
+declare module "next-auth" {
+  interface Session {
+    accessToken?: string;
+  }
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
     Kakao({
       clientId: process.env.KAKAO_CLIENT_ID!,
       clientSecret: process.env.KAKAO_CLIENT_SECRET!,
@@ -18,25 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
-        // 소셜 로그인 직후 — 서버에 유저 동기화
-        try {
-          const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/users/sync`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                email: user.email,
-                name: user.name,
-                image: user.image,
-              }),
-            },
-          );
-          const dbUser = await res.json();
-          token.userId = dbUser.id;
-        } catch {
-          // 서버 미연결 시 graceful fallback
-        }
+        token.userId = user.id;
       }
       return token;
     },
@@ -44,6 +28,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.userId) {
         session.user.id = token.userId as string;
       }
+      // NestJS 서버로 보낼 JWT 생성 (jose 사용 - Edge 호환)
+      const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
+      session.accessToken = await new SignJWT({
+        sub: token.userId as string,
+        email: token.email,
+        name: token.name,
+      })
+        .setProtectedHeader({ alg: "HS256" })
+        .setExpirationTime("7d")
+        .sign(secret);
       return session;
     },
   },

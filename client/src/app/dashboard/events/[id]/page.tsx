@@ -1,15 +1,14 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { use } from "react";
-import { api, type EventDetail } from "@/lib/api";
+import { createFetchClient } from "@/lib/fetch-client";
+import { auth } from "@/lib/auth";
+import { BackButton } from "@/components/back-button";
+import type { EventDetail } from "@/lib/api";
 
 const TYPE_LABEL: Record<string, string> = {
   WEDDING: "결혼",
@@ -18,31 +17,45 @@ const TYPE_LABEL: Record<string, string> = {
   ETC: "기타",
 };
 
-export default function EventDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
-  const router = useRouter();
-  const [event, setEvent] = useState<EventDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+async function getEvent(id: string): Promise<EventDetail | null> {
+  const session = await auth();
+  if (!session?.accessToken) return null;
 
-  useEffect(() => {
-    api.events
-      .get(id)
-      .then(setEvent)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [id]);
+  const serverClient = createFetchClient(
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+  );
+  serverClient.setAuthToken(session.accessToken);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-dvh">
-        <p className="text-sm text-muted-foreground">불러오는 중...</p>
-      </div>
-    );
+  try {
+    return await serverClient.get<EventDetail>(`/events/${id}`);
+  } catch {
+    return null;
   }
+}
+
+function EventDetailSkeleton() {
+  return (
+    <div className="flex flex-col px-5 pt-14 pb-4">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="h-5 w-5 bg-muted rounded animate-pulse" />
+        <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+      </div>
+      <Card className="p-4 mb-6 animate-pulse">
+        <div className="h-20 bg-muted rounded" />
+      </Card>
+      <div className="flex flex-col gap-2">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="p-3 animate-pulse">
+            <div className="h-12 bg-muted rounded" />
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+async function EventDetailContent({ id }: { id: string }) {
+  const event = await getEvent(id);
 
   if (!event) {
     return (
@@ -58,9 +71,7 @@ export default function EventDetailPage({
     <div className="flex flex-col px-5 pt-14 pb-4">
       {/* 헤더 */}
       <div className="flex items-center gap-3 mb-4">
-        <button onClick={() => router.back()}>
-          <ArrowLeft size={20} />
-        </button>
+        <BackButton />
         <h1 className="text-xl font-bold">{event.title}</h1>
       </div>
 
@@ -118,5 +129,19 @@ export default function EventDetailPage({
         ))}
       </div>
     </div>
+  );
+}
+
+export default async function EventDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  return (
+    <Suspense fallback={<EventDetailSkeleton />}>
+      <EventDetailContent id={id} />
+    </Suspense>
   );
 }

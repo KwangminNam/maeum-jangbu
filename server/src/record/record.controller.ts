@@ -9,11 +9,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RecordService } from './record.service.js';
-import { DevAuthGuard } from '../auth/dev-auth.guard.js'; // TODO: JwtAuthGuard로 되돌릴 것
+import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
 import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
 import { CreateRecordDto } from './dto/create-record.dto.js';
 
-@UseGuards(DevAuthGuard)
+@UseGuards(JwtAuthGuard)
 @Controller('records')
 export class RecordController {
   constructor(private recordService: RecordService) {}
