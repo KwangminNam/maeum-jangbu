@@ -1,8 +1,8 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Suspense } from "@/components/ui/suspense";
 import { createFetchClient } from "@/lib/fetch-client";
 import { auth } from "@/lib/auth";
 import { BackButton } from "@/components/back-button";
@@ -123,15 +123,15 @@ export default async function EventDetailPage({
       {/* 헤더 - BackButton 즉시 표시 */}
       <div className="flex items-center gap-3 mb-4">
         <BackButton />
-        <Suspense fallback={<div className="h-6 w-32 bg-muted rounded animate-pulse" />}>
+        <Suspense.Skeleton skeleton={<div className="h-6 w-32 bg-muted rounded animate-pulse" />}>
           <EventTitle id={id} />
-        </Suspense>
+        </Suspense.Skeleton>
       </div>
 
       {/* 콘텐츠 */}
-      <Suspense fallback={<EventContentSkeleton />}>
+      <Suspense.Skeleton skeleton={<EventContentSkeleton />}>
         <EventContent id={id} />
-      </Suspense>
+      </Suspense.Skeleton>
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { Suspense } from "react";
 import { Card } from "@/components/ui/card";
+import { Suspense } from "@/components/ui/suspense";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { createFetchClient } from "@/lib/fetch-client";
@@ -192,8 +192,8 @@ export default async function FriendDetailPage({
       {/* 헤더 - BackButton 즉시 표시 */}
       <div className="flex items-center gap-3 mb-6">
         <BackButton />
-        <Suspense
-          fallback={
+        <Suspense.Skeleton
+          skeleton={
             <div className="space-y-2">
               <div className="h-6 w-24 bg-muted rounded animate-pulse" />
               <div className="h-4 w-16 bg-muted rounded animate-pulse" />
@@ -201,13 +201,13 @@ export default async function FriendDetailPage({
           }
         >
           <FriendHeader id={id} />
-        </Suspense>
+        </Suspense.Skeleton>
       </div>
 
       {/* 콘텐츠 */}
-      <Suspense fallback={<FriendContentSkeleton />}>
+      <Suspense.Skeleton skeleton={<FriendContentSkeleton />}>
         <FriendContent id={id} />
-      </Suspense>
+      </Suspense.Skeleton>
     </div>
   );
 }

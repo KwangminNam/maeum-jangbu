@@ -44,75 +44,136 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* 토스 스타일 커스텀 색상 */
+  --color-toss-blue: var(--toss-blue);
+  --color-toss-blue-light: var(--toss-blue-light);
+  --color-toss-blue-dark: var(--toss-blue-dark);
+  --color-toss-green: var(--toss-green);
+  --color-toss-red: var(--toss-red);
+  --color-toss-yellow: var(--toss-yellow);
+  --color-toss-gray: var(--toss-gray);
 }
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* 토스 스타일 색상 팔레트 */
+  --toss-blue: #3182f6;
+  --toss-blue-light: #e8f3ff;
+  --toss-blue-dark: #1b64da;
+  --toss-green: #00c471;
+  --toss-red: #f04452;
+  --toss-yellow: #ffc043;
+  --toss-gray: #8b95a1;
+
+  /* 기본 색상 (토스 스타일) */
+  --background: #ffffff;
+  --foreground: #191f28;
+  --card: #ffffff;
+  --card-foreground: #191f28;
+  --popover: #ffffff;
+  --popover-foreground: #191f28;
+
+  /* Primary: 토스 블루 */
+  --primary: #3182f6;
+  --primary-foreground: #ffffff;
+
+  /* Secondary: 연한 회색 */
+  --secondary: #f2f4f6;
+  --secondary-foreground: #4e5968;
+
+  /* Muted */
+  --muted: #f2f4f6;
+  --muted-foreground: #8b95a1;
+
+  /* Accent */
+  --accent: #e8f3ff;
+  --accent-foreground: #3182f6;
+
+  /* Destructive */
+  --destructive: #f04452;
+
+  /* Border & Input */
+  --border: #e5e8eb;
+  --input: #e5e8eb;
+  --ring: #3182f6;
+
+  /* Charts (토스 스타일) */
+  --chart-1: #3182f6;
+  --chart-2: #00c471;
+  --chart-3: #ffc043;
+  --chart-4: #f04452;
+  --chart-5: #8b95a1;
+
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #191f28;
+  --sidebar-primary: #3182f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8f3ff;
+  --sidebar-accent-foreground: #3182f6;
+  --sidebar-border: #e5e8eb;
+  --sidebar-ring: #3182f6;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* 토스 다크모드 스타일 */
+  --toss-blue: #4593fc;
+  --toss-blue-light: #1a2a3d;
+  --toss-blue-dark: #6aabff;
+  --toss-green: #2de283;
+  --toss-red: #ff6b6b;
+  --toss-yellow: #ffd43b;
+  --toss-gray: #8b95a1;
+
+  --background: #17171c;
+  --foreground: #f2f4f6;
+  --card: #1e1e23;
+  --card-foreground: #f2f4f6;
+  --popover: #1e1e23;
+  --popover-foreground: #f2f4f6;
+
+  /* Primary: 토스 블루 (다크) */
+  --primary: #4593fc;
+  --primary-foreground: #ffffff;
+
+  /* Secondary */
+  --secondary: #2c2c34;
+  --secondary-foreground: #b0b8c1;
+
+  /* Muted */
+  --muted: #2c2c34;
+  --muted-foreground: #8b95a1;
+
+  /* Accent */
+  --accent: #1a2a3d;
+  --accent-foreground: #4593fc;
+
+  /* Destructive */
+  --destructive: #ff6b6b;
+
+  /* Border & Input */
+  --border: #2c2c34;
+  --input: #2c2c34;
+  --ring: #4593fc;
+
+  /* Charts (다크 모드) */
+  --chart-1: #4593fc;
+  --chart-2: #2de283;
+  --chart-3: #ffd43b;
+  --chart-4: #ff6b6b;
+  --chart-5: #8b95a1;
+
+  /* Sidebar */
+  --sidebar: #1e1e23;
+  --sidebar-foreground: #f2f4f6;
+  --sidebar-primary: #4593fc;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a2a3d;
+  --sidebar-accent-foreground: #4593fc;
+  --sidebar-border: #2c2c34;
+  --sidebar-ring: #4593fc;
 }
 
 @layer base {

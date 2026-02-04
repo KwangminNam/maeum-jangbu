@@ -2,9 +2,7 @@
 
 import { use, useEffect } from "react";
 import Link from "next/link";
-import { ChevronRight, CheckCircle2 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { ChevronRight, CheckCircle2, Users } from "lucide-react";
 import type { Friend } from "@/lib/api";
 
 interface FriendCardsProps {
@@ -22,7 +20,6 @@ export function FriendCards({
 }: FriendCardsProps) {
   const friends = use(friendsPromise);
 
-  // 부모에게 로드된 데이터 전달 (새 지인 추가 시 필요)
   useEffect(() => {
     onFriendsLoaded(friends);
   }, [friends, onFriendsLoaded]);
@@ -35,14 +32,19 @@ export function FriendCards({
 
   if (filtered.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground text-center py-10">
-        {friends.length === 0 ? "등록된 지인이 없습니다" : "검색 결과가 없습니다"}
-      </p>
+      <div className="flex flex-col items-center justify-center py-16">
+        <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center mb-4">
+          <Users size={28} className="text-primary" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          {friends.length === 0 ? "등록된 지인이 없습니다" : "검색 결과가 없습니다"}
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       {filtered.map((friend) => {
         const totalAmount = friend.records.reduce(
           (sum, r) => sum + r.amount,
@@ -51,28 +53,32 @@ export function FriendCards({
         const hasSentRecords = friend.sentRecords && friend.sentRecords.length > 0;
         return (
           <Link key={friend.id} href={`/dashboard/friends/${friend.id}`}>
-            <Card className="p-4 hover:bg-accent/50 transition-colors">
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200">
               <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm">
-                      {friend.name}
-                    </span>
-                    <Badge variant="secondary" className="text-xs">
-                      {friend.relation}
-                    </Badge>
-                    {hasSentRecords && (
-                      <CheckCircle2 size={14} className="text-green-500" />
-                    )}
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-semibold">
+                    {friend.name.charAt(0)}
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {friend.records.length}건 ·{" "}
-                    {totalAmount.toLocaleString()}원
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">{friend.name}</span>
+                      {hasSentRecords && (
+                        <CheckCircle2 size={14} className="text-toss-green" />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-accent-foreground font-medium">
+                        {friend.relation}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {friend.records.length}건 · {totalAmount.toLocaleString()}원
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-muted-foreground" />
+                <ChevronRight size={18} className="text-muted-foreground" />
               </div>
-            </Card>
+            </div>
           </Link>
         );
       })}
@@ -82,11 +88,17 @@ export function FriendCards({
 
 export function FriendCardsSkeleton() {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       {[1, 2, 3, 4].map((i) => (
-        <Card key={i} className="p-4 animate-pulse">
-          <div className="h-12 bg-muted rounded" />
-        </Card>
+        <div key={i} className="p-4 rounded-2xl bg-card border border-border animate-pulse">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-muted" />
+            <div className="flex-1">
+              <div className="h-5 w-24 bg-muted rounded mb-2" />
+              <div className="h-4 w-32 bg-muted rounded" />
+            </div>
+          </div>
+        </div>
       ))}
     </div>
   );

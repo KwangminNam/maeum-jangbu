@@ -8,14 +8,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
+import { DatePicker } from "@/components/ui/date-picker";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
@@ -32,10 +27,10 @@ import { api } from "@/lib/api";
 import { revalidateEventDetail, revalidateDashboard } from "@/lib/actions";
 
 const EVENT_TYPES = [
-  { value: "WEDDING", label: "결혼식" },
-  { value: "FUNERAL", label: "장례식" },
-  { value: "BIRTHDAY", label: "생일/잔치" },
-  { value: "ETC", label: "기타" },
+  { value: "WEDDING", label: "결혼식", emoji: "💒", gradient: "from-pink-100 to-rose-100 dark:from-pink-950/40 dark:to-rose-950/40", ring: "ring-pink-400" },
+  { value: "FUNERAL", label: "장례식", emoji: "🕯️", gradient: "from-purple-100 to-violet-100 dark:from-purple-950/40 dark:to-violet-950/40", ring: "ring-purple-400" },
+  { value: "BIRTHDAY", label: "생일/잔치", emoji: "🎂", gradient: "from-amber-100 to-yellow-100 dark:from-amber-950/40 dark:to-yellow-950/40", ring: "ring-amber-400" },
+  { value: "ETC", label: "기타", emoji: "🎉", gradient: "from-slate-100 to-gray-100 dark:from-slate-900/40 dark:to-gray-900/40", ring: "ring-slate-400" },
 ];
 
 const TYPE_LABEL: Record<string, string> = {
@@ -302,34 +297,39 @@ export function EditEventForm({
                   placeholder="예: 나의 결혼식"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="h-11 rounded-xl"
+                  className="h-11 rounded-xl border-2 focus:border-blue-400"
                 />
               </div>
 
               <div className="flex flex-col gap-2">
                 <Label className="text-sm font-medium">이벤트 유형</Label>
-                <Select value={type} onValueChange={setType}>
-                  <SelectTrigger className="h-11 rounded-xl">
-                    <SelectValue placeholder="유형을 선택하세요" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EVENT_TYPES.map((t) => (
-                      <SelectItem key={t.value} value={t.value}>
-                        {t.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="grid grid-cols-2 gap-2">
+                  {EVENT_TYPES.map((eventType) => (
+                    <motion.button
+                      key={eventType.value}
+                      type="button"
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setType(eventType.value)}
+                      className={cn(
+                        "p-3 rounded-xl border-2 transition-all flex items-center gap-2",
+                        type === eventType.value
+                          ? `bg-gradient-to-br ${eventType.gradient} border-transparent ${eventType.ring} ring-2 ring-offset-1`
+                          : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300"
+                      )}
+                    >
+                      <span className="text-lg">{eventType.emoji}</span>
+                      <span className="font-medium text-sm">{eventType.label}</span>
+                    </motion.button>
+                  ))}
+                </div>
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="edit-date" className="text-sm font-medium">날짜</Label>
-                <Input
-                  id="edit-date"
-                  type="date"
+                <Label className="text-sm font-medium">날짜</Label>
+                <DatePicker
                   value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="h-11 rounded-xl"
+                  onChange={setDate}
+                  placeholder="날짜를 선택하세요"
                 />
               </div>
 
@@ -343,9 +343,16 @@ export function EditEventForm({
                 >
                   취소
                 </Button>
-                <Button
+                <motion.button
                   type="submit"
-                  className="flex-1 h-11 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                  whileHover={!submitting && title && type && date ? { scale: 1.02 } : {}}
+                  whileTap={!submitting && title && type && date ? { scale: 0.98 } : {}}
+                  className={cn(
+                    "flex-1 h-11 rounded-xl font-medium flex items-center justify-center transition-all",
+                    !title || !type || !date || submitting
+                      ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/50"
+                  )}
                   disabled={!title || !type || !date || submitting}
                 >
                   {submitting ? (
@@ -353,7 +360,7 @@ export function EditEventForm({
                   ) : (
                     "저장"
                   )}
-                </Button>
+                </motion.button>
               </div>
             </form>
           </Card>

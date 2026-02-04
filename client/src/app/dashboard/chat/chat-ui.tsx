@@ -7,18 +7,22 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { BackButton } from "@/components/back-button";
 import { cn } from "@/lib/utils";
-import { useChatStore } from "@/lib/stores/chat";
 
 const SUGGESTIONS = [
   "내 경조사 기록 요약해줘",
   "가장 많이 주고받은 지인은?",
   "결혼식 적정 축의금 알려줘",
-  "이번 달 경조사 지출은?",
+  "새 이벤트 추가해줘",
 ];
 
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+}
+
 export function ChatUI() {
-  const { messages, addMessage, updateLastAssistantMessage, clearMessages } =
-    useChatStore();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -33,30 +37,23 @@ export function ChatUI() {
     async (content: string) => {
       if (!content.trim() || isLoading) return;
 
-      const userMessage = {
+      const userMessage: Message = {
         id: Date.now().toString(),
-        role: "user" as const,
+        role: "user",
         content,
       };
 
-      addMessage(userMessage);
+      const newMessages = [...messages, userMessage];
+      setMessages(newMessages);
       setInput("");
       setIsLoading(true);
-
-      const assistantMessage = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant" as const,
-        content: "",
-      };
-
-      addMessage(assistantMessage);
 
       try {
         const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: [...messages, userMessage].map((m) => ({
+            messages: newMessages.map((m) => ({
               role: m.role,
               content: m.content,
             })),
@@ -70,6 +67,14 @@ export function ChatUI() {
 
         if (reader) {
           let fullContent = "";
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: "",
+          };
+
+          setMessages([...newMessages, assistantMessage]);
+
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
@@ -77,18 +82,30 @@ export function ChatUI() {
             const chunk = decoder.decode(value);
             fullContent += chunk;
 
-            updateLastAssistantMessage(fullContent);
+            setMessages(prev => {
+              const updated = [...prev];
+              updated[updated.length - 1] = {
+                ...updated[updated.length - 1],
+                content: fullContent,
+              };
+              return updated;
+            });
           }
         }
       } catch {
-        updateLastAssistantMessage(
-          "죄송합니다. 오류가 발생했습니다. 다시 시도해주세요."
-        );
+        setMessages(prev => [
+          ...prev,
+          {
+            id: (Date.now() + 1).toString(),
+            role: "assistant",
+            content: "죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.",
+          },
+        ]);
       } finally {
         setIsLoading(false);
       }
     },
-    [messages, isLoading, addMessage, updateLastAssistantMessage]
+    [messages, isLoading]
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -100,6 +117,10 @@ export function ChatUI() {
     sendMessage(suggestion);
   };
 
+  const clearMessages = () => {
+    setMessages([]);
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* 헤더 */}
@@ -108,7 +129,7 @@ export function ChatUI() {
         <div className="flex-1">
           <h1 className="text-xl font-bold">AI 어시스턴트</h1>
           <p className="text-xs text-muted-foreground">
-            경조사 기록을 분석하고 제안해드려요
+            경조사 기록을 분석하고 관리해드려요
           </p>
         </div>
         {messages.length > 0 && (
@@ -135,7 +156,7 @@ export function ChatUI() {
             </div>
             <h2 className="font-semibold mb-2">무엇을 도와드릴까요?</h2>
             <p className="text-sm text-muted-foreground mb-6">
-              경조사 기록을 분석하고 적정 금액을 제안해드려요
+              경조사 기록 분석, 이벤트 생성, 지인 추가 등을 도와드려요
             </p>
             <div className="flex flex-wrap gap-2 justify-center max-w-sm">
               {SUGGESTIONS.map((suggestion) => (
@@ -187,6 +208,17 @@ export function ChatUI() {
             </div>
           ))
         )}
+        {/* 로딩 중일 때 로딩 표시 */}
+        {isLoading && messages.length > 0 && !messages[messages.length - 1]?.content && messages[messages.length - 1]?.role === "assistant" && (
+          <div className="flex gap-3 justify-start">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <Bot size={16} className="text-primary" />
+            </div>
+            <Card className="px-4 py-3 bg-muted">
+              <Loader2 size={16} className="animate-spin text-muted-foreground" />
+            </Card>
+          </div>
+        )}
       </div>
 
       {/* 입력 영역 */}
@@ -196,10 +228,10 @@ export function ChatUI() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="메시지를 입력하세요..."
-            className="flex-1"
+            className="flex-1 rounded-xl"
             disabled={isLoading}
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+          <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="rounded-xl">
             <Send size={18} />
           </Button>
         </form>
