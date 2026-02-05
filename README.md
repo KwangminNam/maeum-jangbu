@@ -1,4 +1,4 @@
-# 마음장부
+# 마음장부 2026.02.03 ~ WIP 
 https://maeum-jangbu.vercel.app/
 
 > **Vibe Coding**
