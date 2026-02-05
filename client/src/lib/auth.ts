@@ -20,6 +20,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async jwt({ token, user, account }) {
       if (account && user) {
+        // 카카오는 이메일 동의 안하면 email이 없음 - providerAccountId로 대체
+        const userEmail = user.email || `kakao_${account.providerAccountId}@placeholder.local`;
+
         // DB에 유저 생성/조회 후 DB의 user ID를 토큰에 저장
         try {
           const res = await fetch(
@@ -28,7 +31,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                email: user.email,
+                email: userEmail,
                 name: user.name,
                 image: user.image,
               }),
