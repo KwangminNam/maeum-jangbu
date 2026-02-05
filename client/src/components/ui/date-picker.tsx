@@ -139,7 +139,7 @@ export function DatePicker({ value, onChange, placeholder = "날짜를 선택하
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="absolute top-full left-0 right-0 mt-2 p-4 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 z-50"
+            className="absolute bottom-full left-0 right-0 mb-2 p-4 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 z-50"
           >
             {/* 헤더 */}
             <div className="flex items-center justify-between mb-4">

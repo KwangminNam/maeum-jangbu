@@ -113,7 +113,7 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
   };
 
   return (
-    <div className="flex flex-col px-5 pt-14 pb-8 h-full">
+    <div className="flex flex-col px-5 pt-14 pb-20 h-full">
       {/* 헤더 */}
       <div className="flex items-center gap-3 mb-6">
         <BackButton />
@@ -278,7 +278,7 @@ export function RecordForm({ eventId, friendsPromise }: RecordFormProps) {
       </Card>
 
       {/* 제출 */}
-      <div className="mt-auto pt-6">
+      <div className="mt-auto py-6">
         {amount > 0 && totalPeople > 0 && (
           <Card className="p-4 mb-4 border bg-accent">
             <div className="flex items-center justify-between">

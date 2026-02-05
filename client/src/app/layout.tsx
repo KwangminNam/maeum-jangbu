@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
@@ -19,6 +19,13 @@ export const metadata: Metadata = {
   description: "경조사 내역 관리 및 AI 적정 금액 제안 서비스",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,7 +37,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-muted flex justify-center items-center min-h-screen`}
       >
         <Providers>
-          <div className="w-[393px] h-[852px] max-h-dvh bg-background shadow-xl relative overflow-hidden">
+          <div className="w-[393px] h-[852px] max-h-dvh bg-background shadow-xl relative overflow-hidden touch-pan-y overscroll-contain">
             {children}
           </div>
           <Toaster position="top-center" richColors />

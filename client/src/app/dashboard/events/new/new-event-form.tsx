@@ -199,7 +199,7 @@ export function NewEventForm() {
                 placeholder="예: 나의 결혼식, 아버지 칠순"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="h-12 px-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-0 transition-all text-sm"
+                className="h-12 px-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-blue-400 dark:focus:border-blue-500 focus:ring-0 transition-all text-base"
               />
               {title && (
                 <motion.div
@@ -271,7 +271,7 @@ export function NewEventForm() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="sticky bottom-0 px-5 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800"
+        className="sticky bottom-0 px-5 pt-4 pb-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800"
       >
         <motion.button
           type="submit"

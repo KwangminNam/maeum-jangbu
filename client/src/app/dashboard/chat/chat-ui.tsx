@@ -149,7 +149,7 @@ export function ChatUI() {
         ref={scrollRef}
         className="flex-1 overflow-y-auto px-5 py-4 space-y-4"
       >
-        {messages.length === 0 ? (
+        {messages.length === 0 && !isLoading ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <Bot size={32} className="text-primary" />
@@ -173,51 +173,53 @@ export function ChatUI() {
             </div>
           </div>
         ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                "flex gap-3",
-                message.role === "user" ? "justify-end" : "justify-start"
-              )}
-            >
-              {message.role === "assistant" && (
+          <>
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={cn(
+                  "flex gap-3",
+                  message.role === "user" ? "justify-end" : "justify-start"
+                )}
+              >
+                {message.role === "assistant" && (
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Bot size={16} className="text-primary" />
+                  </div>
+                )}
+                <Card
+                  className={cn(
+                    "px-4 py-3 max-w-[80%]",
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                  )}
+                >
+                  <p className="text-sm whitespace-pre-wrap">
+                    {message.content || (
+                      <Loader2 size={16} className="animate-spin text-muted-foreground" />
+                    )}
+                  </p>
+                </Card>
+                {message.role === "user" && (
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+                    <User size={16} className="text-primary-foreground" />
+                  </div>
+                )}
+              </div>
+            ))}
+            {/* 로딩 중이고 마지막 메시지가 user인 경우 로딩 스피너 표시 */}
+            {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === "user" && (
+              <div className="flex gap-3 justify-start">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                   <Bot size={16} className="text-primary" />
                 </div>
-              )}
-              <Card
-                className={cn(
-                  "px-4 py-3 max-w-[80%]",
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
-                )}
-              >
-                <p className="text-sm whitespace-pre-wrap">
-                  {message.content || (
-                    <Loader2 size={16} className="animate-spin text-muted-foreground" />
-                  )}
-                </p>
-              </Card>
-              {message.role === "user" && (
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-                  <User size={16} className="text-primary-foreground" />
-                </div>
-              )}
-            </div>
-          ))
-        )}
-        {/* 로딩 중일 때 로딩 표시 */}
-        {isLoading && messages.length > 0 && !messages[messages.length - 1]?.content && messages[messages.length - 1]?.role === "assistant" && (
-          <div className="flex gap-3 justify-start">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <Bot size={16} className="text-primary" />
-            </div>
-            <Card className="px-4 py-3 bg-muted">
-              <Loader2 size={16} className="animate-spin text-muted-foreground" />
-            </Card>
-          </div>
+                <Card className="px-4 py-3 bg-muted">
+                  <Loader2 size={16} className="animate-spin text-muted-foreground" />
+                </Card>
+              </div>
+            )}
+          </>
         )}
       </div>
 
