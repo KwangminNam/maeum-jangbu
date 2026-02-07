@@ -1,4 +1,21 @@
 import { client } from "./fetch-client";
+import type {
+  Event,
+  EventDetail,
+  CreateEvent,
+  Friend,
+  FriendDetail,
+  CreateFriend,
+  GiftRecord,
+  CreateRecord,
+  UpdateRecord,
+  SentRecord,
+  CreateSentRecord,
+  OcrExtractResult,
+  CreateEventOcr,
+  OcrBulkResult,
+  GoldPriceResult,
+} from "./types";
 
 // ── API Methods ──
 export const api = {
@@ -10,6 +27,7 @@ export const api = {
     delete: (id: string) => client.delete(`/events/${id}`),
     ocr: (image: string) => client.post<OcrExtractResult>("/events/ocr", { image }),
     ocrBulk: (data: CreateEventOcr) => client.post<OcrBulkResult>("/events/ocr-bulk", data),
+    getGoldPrice: () => client.get<GoldPriceResult>("/events/gold-price"),
   },
 
   friends: {
@@ -35,129 +53,26 @@ export const api = {
   },
 };
 
-// ── Types ──
-export interface Event {
-  id: string;
-  title: string;
-  type: string;
-  date: string;
-  records: { amount: number }[];
-}
-
-export interface EventDetail {
-  id: string;
-  title: string;
-  type: string;
-  date: string;
-  records: {
-    id: string;
-    amount: number;
-    memo: string | null;
-    friend: { id: string; name: string; relation: string };
-  }[];
-  sentTotalAmount: number; // 해당 이벤트 참여자들에게 보낸 총액
-}
-
-export interface Friend {
-  id: string;
-  name: string;
-  relation: string;
-  records: { amount: number; event: { type: string } }[];
-  sentRecords?: { amount: number; eventType: string }[];
-}
-
-export interface FriendDetail {
-  id: string;
-  name: string;
-  relation: string;
-  records: {
-    id: string;
-    amount: number;
-    memo: string | null;
-    event: { title: string; type: string; date: string };
-  }[];
-  sentRecords: SentRecord[];
-}
-
-export interface SentRecord {
-  id: string;
-  amount: number;
-  date: string;
-  eventType: string;
-  memo: string | null;
-  friendId: string;
-}
-
-export interface GiftRecord {
-  id: string;
-  amount: number;
-  memo: string | null;
-  friend?: { name: string; relation: string };
-  event?: { title: string; type: string; date: string };
-}
-
-export interface CreateEvent {
-  title: string;
-  type: string;
-  date: string;
-}
-
-export interface CreateFriend {
-  name: string;
-  relation: string;
-}
-
-export interface CreateRecord {
-  amount: number;
-  memo?: string;
-  eventId: string;
-  friendId?: string;
-  friendIds?: string[];
-}
-
-export interface UpdateRecord {
-  amount?: number;
-  memo?: string;
-}
-
-export interface CreateSentRecord {
-  amount: number;
-  date: string;
-  eventType: string;
-  memo?: string;
-  friendId: string;
-}
-
-export interface OcrRecord {
-  name: string;
-  amount: number;
-  relation?: string;
-}
-
-export interface OcrExtractResult {
-  records: OcrRecord[];
-}
-
-export interface CreateEventOcr {
-  title: string;
-  type: string;
-  date: string;
-  records: OcrRecord[];
-}
-
-export interface OcrBulkResult {
-  event: Event;
-  records: {
-    name: string;
-    amount: number;
-    friendId: string;
-    isNewFriend: boolean;
-  }[];
-  summary: {
-    totalRecords: number;
-    totalAmount: number;
-    newFriends: number;
-  };
-}
+// Re-export types for backward compatibility
+export type {
+  Event,
+  EventDetail,
+  CreateEvent,
+  Friend,
+  FriendDetail,
+  CreateFriend,
+  GiftRecord,
+  CreateRecord,
+  UpdateRecord,
+  SentRecord,
+  CreateSentRecord,
+  OcrRecord,
+  OcrExtractResult,
+  CreateEventOcr,
+  OcrBulkResult,
+  GoldPriceResult,
+  GiftType,
+  NewFriend,
+} from "./types";
 
 export { client };
