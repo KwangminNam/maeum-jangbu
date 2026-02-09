@@ -1,2 +1,2 @@
-export { useAmount, useAmountContext, AmountContext } from "./use-amount";
-export { useFriends, useFriendsContext, FriendsContext } from "./use-friends";
+export { useAmount, useAmountContext, AmountContext } from "./useAmount";
+export { useFriends, useFriendsContext, FriendsContext } from "./useFriends";

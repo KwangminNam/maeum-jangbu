@@ -78,3 +78,11 @@ export const RELATION_SUGGESTIONS = [
   "선후배",
   "지인",
 ] as const;
+
+// ── Event Type Labels ──
+export const EVENT_TYPE_LABELS: Record<string, string> = {
+  WEDDING: "결혼",
+  FUNERAL: "장례",
+  BIRTHDAY: "생일/잔치",
+  ETC: "기타",
+} as const;
