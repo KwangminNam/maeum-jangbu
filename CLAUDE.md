@@ -7,7 +7,7 @@
 - **Database**: Supabase (PostgreSQL)
 - **Deployment**: Client on Vercel, Server on SST/Serverless
 - **Package Manager**: pnpm
-- **Testing**: Vitest
+- **Testing**: Vitest (unit), Playwright (e2e)
 
 ## Project Structure
 
@@ -164,7 +164,7 @@ server/src/
 ### Testing & Development Cycle
 - **Always write tests for important logic**: When creating functions or hooks with significant logic, write test code
 - **Development cycle**: 개발 → 테스트 작성 → `pnpm test:run` 확인 → 완료
-- **What to test**:
+- **What to test (unit)**:
   - Custom hooks with state management (useReducer, complex useState)
   - Utility functions with business logic
   - Data transformation functions
@@ -172,7 +172,23 @@ server/src/
 - **Test location**: Place test files next to the source file (e.g., `useSomething.ts` → `useSomething.test.ts`)
 - **Test framework**: Vitest + @testing-library/react + happy-dom
 
+### E2E Testing (MANDATORY)
+- **When a new page or feature is added, writing and running e2e tests is REQUIRED** — do not consider the task complete until e2e tests pass
+- **Development cycle**: Implement feature → Write e2e test → Run `pnpm e2e` → Verify all tests pass → Done
+- **What to test (e2e)**:
+  - Every new page: verify it loads correctly with expected headings, buttons, and content
+  - Every new user flow: form submissions, navigation, dialogs, CRUD operations
+  - Interactions between pages: tab navigation, redirects after form submission
+- **Test location**: `client/e2e/` directory
+- **Auth mocking**: Use `mockAuth(page)` from `e2e/helpers/mock.ts` — it sets a real NextAuth v5 JWE session cookie for server-side auth
+- **API mocking**: Use `mockEventsApi(page)`, `mockFriendsApi(page)` for intercepting backend calls. Add new mock functions in `e2e/helpers/mock.ts` when new API endpoints are introduced
+- **Run commands**:
+  - `pnpm e2e` — headless (CI)
+  - `pnpm e2e:headed` — visible browser
+  - `pnpm e2e:ui` — interactive UI mode
+
 ### Commands
 - Use `pnpm` for all package operations
-- Run tests with `pnpm test:run` (Vitest)
+- Run unit tests with `pnpm test:run` (Vitest)
+- Run e2e tests with `pnpm e2e` (Playwright)
 - Build client with `pnpm run build` in client directory

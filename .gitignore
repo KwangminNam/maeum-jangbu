@@ -1,35 +1,17 @@
-# dependencies
-node_modules/
+# Playwright MCP
+.playwright-mcp/
+
+# SST
+.sst/
 
 # env
 .env
-.env.local
-.env.*.local
 
-# build
-dist/
-.next/
-out/
+# MCP config
+.mcp.json
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# dependencies
+node_modules/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# debug
-npm-debug.log*
-pnpm-debug.log*
-
-# prisma
-server/prisma/*.db
-
-# turbo
-.turbo/
-
-# sst
-.sst/
+# build output
+server/dist/
