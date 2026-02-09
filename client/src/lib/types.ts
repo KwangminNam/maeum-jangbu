@@ -1,3 +1,15 @@
+// ── API Response Types ──
+export interface ApiError {
+  code: string;
+  message: string;
+  details?: unknown;
+}
+
+export interface ApiResponse<T = unknown> {
+  result: T | null;
+  error: ApiError | null;
+}
+
 // ── Event Types ──
 export interface Event {
   id: string;

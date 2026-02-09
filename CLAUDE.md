@@ -124,6 +124,43 @@ server/src/
 - The user is a frontend developer, so **pay extra attention to backend code quality**
 - Ensure proper error handling, validation, and type safety in NestJS code
 
+### API Response Format
+- **All API responses** use standard `ApiResponse<T>` wrapper format
+- Response structure:
+  ```typescript
+  interface ApiResponse<T> {
+    result: T | null;    // 성공 시 데이터, 에러 시 null
+    error: ApiError | null;  // 성공 시 null, 에러 시 에러 정보
+  }
+
+  interface ApiError {
+    code: string;        // VALIDATION_ERROR, NOT_FOUND, UNAUTHORIZED 등
+    message: string;     // 사용자에게 보여줄 메시지
+    details?: unknown;   // 추가 정보 (validation 에러 목록 등)
+  }
+  ```
+- **Success response**: `{ result: { id, title, ... }, error: null }`
+- **Error response**: `{ result: null, error: { code: "NOT_FOUND", message: "..." } }`
+- **Error codes**:
+  | HTTP Status | Error Code |
+  |-------------|------------|
+  | 400 | `VALIDATION_ERROR` |
+  | 401 | `UNAUTHORIZED` |
+  | 403 | `FORBIDDEN` |
+  | 404 | `NOT_FOUND` |
+  | 409 | `CONFLICT` |
+  | 500 | `INTERNAL_ERROR` |
+- **Frontend usage**: `fetch-client.ts`가 자동으로 `result` 추출, `error` 시 `ApiException` throw
+  ```typescript
+  try {
+    const event = await api.events.get("123"); // 자동 result 추출
+  } catch (e) {
+    if (e instanceof ApiException) {
+      console.log(e.code, e.message);
+    }
+  }
+  ```
+
 ### Testing & Development Cycle
 - **Always write tests for important logic**: When creating functions or hooks with significant logic, write test code
 - **Development cycle**: 개발 → 테스트 작성 → `pnpm test:run` 확인 → 완료

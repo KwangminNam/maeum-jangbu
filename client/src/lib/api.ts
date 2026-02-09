@@ -55,6 +55,8 @@ export const api = {
 
 // Re-export types for backward compatibility
 export type {
+  ApiResponse,
+  ApiError,
   Event,
   EventDetail,
   CreateEvent,
@@ -75,4 +77,4 @@ export type {
   NewFriend,
 } from "./types";
 
-export { client };
+export { client, ApiException } from "./fetch-client";

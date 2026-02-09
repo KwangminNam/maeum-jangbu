@@ -1,3 +1,5 @@
+import type { ApiResponse, ApiError } from "./types";
+
 type RequestInterceptor = (config: RequestConfig) => RequestConfig | Promise<RequestConfig>;
 type ResponseInterceptor = (response: Response, data: unknown) => unknown | Promise<unknown>;
 type ErrorInterceptor = (error: FetchError) => unknown | Promise<unknown>;
@@ -16,6 +18,21 @@ export class FetchError extends Error {
   ) {
     super(`HTTP Error ${status}: ${statusText}`);
     this.name = "FetchError";
+  }
+}
+
+export class ApiException extends Error {
+  constructor(
+    public code: string,
+    message: string,
+    public details?: unknown
+  ) {
+    super(message);
+    this.name = "ApiException";
+  }
+
+  static fromApiError(error: ApiError): ApiException {
+    return new ApiException(error.code, error.message, error.details);
   }
 }
 
@@ -129,10 +146,30 @@ class FetchClient {
       data = await response.text();
     }
 
+    // 표준 API 응답 처리 (result/error 형식)
+    const apiResponse = data as ApiResponse<T>;
+
+    if (apiResponse.error) {
+      const apiError = ApiException.fromApiError(apiResponse.error);
+
+      // Apply error interceptors
+      for (const interceptor of this.errorInterceptors) {
+        try {
+          const fallback = await interceptor(
+            new FetchError(response.status, response.statusText, data, response)
+          );
+          if (fallback !== undefined) return fallback as T;
+        } catch (e) {
+          throw e;
+        }
+      }
+
+      throw apiError;
+    }
+
     if (!response.ok) {
       const error = new FetchError(response.status, response.statusText, data, response);
 
-      // Apply error interceptors
       for (const interceptor of this.errorInterceptors) {
         try {
           const result = await interceptor(error);
@@ -146,7 +183,7 @@ class FetchClient {
     }
 
     // Apply response interceptors
-    let result = data;
+    let result = apiResponse.result as unknown;
     for (const interceptor of this.responseInterceptors) {
       result = await interceptor(response, result);
     }
